@@ -1,0 +1,32 @@
+// A task runner that runs a python program
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    /*"version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "echo",
+            "command": "echo Hello",
+            "type": "shell"
+        }
+    ]*/
+    "command": "python",
+    //"showOutput": "always",
+    "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+    },
+    "windows": {
+        "command": "python.exe"
+    },
+    "args": [
+        "${file}"
+    ],
+    "problemMatchers": [],
+    "group": {
+        "kind": "build",
+        "isDefault": true
+    }
+}

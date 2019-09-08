@@ -1,0 +1,7 @@
+'project': "vix_es",
+'filename': "@ES_continuous (Daily).csv",
+'series_name': "ES",
+'chart_title': "ES Continuous",
+'column_name': "Close",
+
+

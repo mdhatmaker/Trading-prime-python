@@ -1,0 +1,7 @@
+'project': "vix_es",
+'filename': "@VX_calendar.csv",
+'series_name': "VIX calendar",
+'chart_title': "VIX Calendar (1-month)",
+'column_name': "Close",
+
+

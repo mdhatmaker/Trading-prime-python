@@ -1,0 +1,5 @@
+'project': "vix_es",
+'symbol': "@VX",
+'start_year': 2010,
+'end_year': 2017,
+'timeframe': "Daily",
