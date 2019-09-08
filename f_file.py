@@ -5,16 +5,12 @@ import os
 import errno
 import requests
 import csv
+import urlparse
 import json
 import gzip
 import shutil
 import sys
-#import urlparse
-try:
-    from urllib.parse import urlparse
-except ImportError:
-     from urlparse import urlparse
-     
+
 #-----------------------------------------------------------------------------------------------------------------------
 coinmetrics_symbols = ['btc', 'bch', 'ltc', 'eth', 'xem', 'dcr', 'zec', 'dash', 'doge', 'etc', 'pivx', 'xmr']
 #-----------------------------------------------------------------------------------------------------------------------

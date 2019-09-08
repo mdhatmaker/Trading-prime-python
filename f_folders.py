@@ -56,7 +56,6 @@ crypto_folder = join(data_folder, "DF_CRYPTO")
 misc_folder = join(data_folder, "MISC")
 system_folder = join(data_folder, "SYSTEM")
 excel_folder = join(data_folder, "EXCEL")
-charts_folder = join(data_folder, "CHARTS")
 
 # Add to the PYTHONPATH the folder containing python function modules
 li = ["X:\\Users\\Trader\\Dropbox\\alvin\\python", "C:\\Users\\Trader\\Dropbox\\alvin\\python", "D:\\Users\\mhatmaker\\Dropbox\\alvin\\python", "/Users/michael/Dropbox/alvin/python"]

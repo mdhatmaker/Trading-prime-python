@@ -16,7 +16,6 @@ from f_calc import *
 from f_dataframe import *
 from f_rolldate import *
 from f_chart import *
-from f_plot import *
 
 project_folder = join(data_folder, "copper")
 
@@ -269,71 +268,68 @@ def get_futures_data_for_year(data, year, instrument):
 # data is a dictionary and cal is the calendar symbol in "mYmY" format (i.e. "H6J6")
 #def get_calendar_data(data, cal, instrument="HG"):
 def get_calendar_data(cal, instrument="HG"):
-    try:
-        (mc1, ystr1, mc2, ystr2, symbol1, symbol2) = get_quandl_cal_symbols(cal)
-        """
-        dt2 = datetime(y1, get_month_number(mc1), 31)
-        dt1 = dt2.replace(day=1)
-        dt1 = dt1 - timedelta(months=6)
-        print dt1, dt2
-        sys.exit()
-        """
-        y_prev = previous_year(ystr1)
-        dts = ""
-        dte = ""
-        if (mc1 == "H" and (mc2 == "J" or mc2 == "K")):
-            dts = y_prev + "-9-1"
-            dte = ystr2 + "-3-31"
-        elif (mc1 == "K" and (mc2 == "M" or mc2 == "N")):
-            dts = y_prev + "-12-1"
-            dte = ystr2 + "-5-31"
-        elif (mc1 == "N" and (mc2 == "Q" or mc2 == "U")):
-            dts = ystr1 + "-3-1"
-            dte = ystr2 + "-7-31"
-        elif (mc1 == "U" and (mc2 == "V" or mc2 == "X" or mc2 == "Z")):
-            dts = ystr1 + "-5-1"
-            dte = ystr2 + "-9-30"
-        elif (mc1 == "Z" and (mc2 == "F" or mc2 == "G" or mc2 == "H")):
-            dts = ystr1 + "-7-1"
-            dte = ystr2 + "-12-31"
-        else:
-            raise ValueError
+    (mc1, ystr1, mc2, ystr2, symbol1, symbol2) = get_quandl_cal_symbols(cal)
+    """
+    dt2 = datetime(y1, get_month_number(mc1), 31)
+    dt1 = dt2.replace(day=1)
+    dt1 = dt1 - timedelta(months=6)
+    print dt1, dt2
+    sys.exit()
+    """
+    y_prev = previous_year(ystr1)
+    dts = ""
+    dte = ""
+    if (mc1 == "H" and (mc2 == "J" or mc2 == "K")):
+        dts = y_prev + "-9-1"
+        dte = ystr2 + "-3-31"
+    elif (mc1 == "K" and (mc2 == "M" or mc2 == "N")):
+        dts = y_prev + "-12-1"
+        dte = ystr2 + "-5-31"
+    elif (mc1 == "N" and (mc2 == "Q" or mc2 == "U")):
+        dts = ystr1 + "-3-1"
+        dte = ystr2 + "-7-31"
+    elif (mc1 == "U" and (mc2 == "V" or mc2 == "X" or mc2 == "Z")):
+        dts = ystr1 + "-5-1"
+        dte = ystr2 + "-9-30"
+    elif (mc1 == "Z" and (mc2 == "F" or mc2 == "G" or mc2 == "H")):
+        dts = ystr1 + "-7-1"
+        dte = ystr2 + "-12-31"
+    else:
+        raise ValueError
 
-        print(symbol1, symbol2, dts, dte)
+    print(symbol1, symbol2, dts, dte)
+    
+    #data[cal[0:3]] = quandl.get(symbol1, start_date=dts, end_date=dte)
+    #data[cal[3:]] = quandl.get(symbol2, start_date=dts, end_date=dte)
 
-        #data[cal[0:3]] = quandl.get(symbol1, start_date=dts, end_date=dte)
-        #data[cal[3:]] = quandl.get(symbol2, start_date=dts, end_date=dte)
-
-        df1 = quandl.get(symbol1, start_date=dts, end_date=dte)
-        df2 = quandl.get(symbol2, start_date=dts, end_date=dte)
-        #print df1
-        #print df2
-        df1.rename(columns={"Prev. Day Open Interest":"OpenInterest", "Open Interest":"OpenInterest", "Previous Day Open Interest":"OpenInterest"}, inplace=True)
-        df2.rename(columns={"Prev. Day Open Interest":"OpenInterest", "Open Interest":"OpenInterest", "Previous Day Open Interest":"OpenInterest"}, inplace=True)
-        df1.index.names = ["DateTime"]
-        df2.index.names = ["DateTime"]
-        df1 = df1.astype({"Volume":"int", "OpenInterest":"int"})
-        df2 = df2.astype({"Volume":"int", "OpenInterest":"int"})
-        if df1.shape[0] > 0:
-            mYY1 = cal[0] + cal[1:3]
-            filename1 = "quandl_QHG" + mYY1 + ".DF.csv"
-            df1 = df1.reset_index()
-            write_dataframe(df1, join(quandl_folder, filename1))
-        if df2.shape[0] > 0:
-            mYY2 = cal[3] + cal[4:6]
-            filename2 = "quandl_QHG" + mYY2 + ".DF.csv"
-            df2 = df2.reset_index()
-            write_dataframe(df2, join(quandl_folder, filename2))
-        if df1.shape[0] > 0 and df2.shape[0] > 0:
-            dfx = pd.merge(df1, df2, on="DateTime")
-            dfx['Cal'] = (dfx.Settle_x - dfx.Settle_y) * 100
-            dfx.sort_values('DateTime', inplace=True)
-            dfx['DateTime'] = dfx.DateTime.apply(update_hour)
-            dfx.drop(['Open_x','High_x','Low_x','Last_x','Change_x','Open_y','High_y','Low_y','Last_y','Change_y'], axis=1, inplace=True)
-            filenamex = "quandl_QHG{0}-QHG{1}.DF.csv".format(mYY1, mYY2)
-            write_dataframe(dfx, join(quandl_folder, filenamex))
-    except:
-        print "Exception occurred retrieving Quandl data calendar data"
+    df1 = quandl.get(symbol1, start_date=dts, end_date=dte)
+    df2 = quandl.get(symbol2, start_date=dts, end_date=dte)
+    #print df1
+    #print df2
+    df1.rename(columns={"Prev. Day Open Interest":"OpenInterest", "Open Interest":"OpenInterest", "Previous Day Open Interest":"OpenInterest"}, inplace=True)
+    df2.rename(columns={"Prev. Day Open Interest":"OpenInterest", "Open Interest":"OpenInterest", "Previous Day Open Interest":"OpenInterest"}, inplace=True)
+    df1.index.names = ["DateTime"]
+    df2.index.names = ["DateTime"]
+    df1 = df1.astype({"Volume":"int", "OpenInterest":"int"})
+    df2 = df2.astype({"Volume":"int", "OpenInterest":"int"})
+    if df1.shape[0] > 0:
+        mYY1 = cal[0] + cal[1:3]
+        filename1 = "quandl_QHG" + mYY1 + ".DF.csv"
+        df1 = df1.reset_index()
+        write_dataframe(df1, join(quandl_folder, filename1))
+    if df2.shape[0] > 0:
+        mYY2 = cal[3] + cal[4:6]
+        filename2 = "quandl_QHG" + mYY2 + ".DF.csv"
+        df2 = df2.reset_index()
+        write_dataframe(df2, join(quandl_folder, filename2))
+    if df1.shape[0] > 0 and df2.shape[0] > 0:
+        dfx = pd.merge(df1, df2, on="DateTime")
+        dfx['Cal'] = (dfx.Settle_x - dfx.Settle_y) * 100
+        dfx.sort_values('DateTime', inplace=True)
+        dfx['DateTime'] = dfx.DateTime.apply(update_hour)
+        dfx.drop(['Open_x','High_x','Low_x','Last_x','Change_x','Open_y','High_y','Low_y','Last_y','Change_y'], axis=1, inplace=True)
+        filenamex = "quandl_QHG{0}-QHG{1}.DF.csv".format(mYY1, mYY2)
+        write_dataframe(dfx, join(quandl_folder, filenamex))        
     return
 
 #def get_calendar_data_for_year(data, year, instrument="HG"):
@@ -363,11 +359,10 @@ def update_quandl_data(force_update_all=False):
         get_calendar_data_for_year(y)
     return
 
-# NOTE: Changed this from 13 to 14 to match the Eastern times of IQFeed Historical data
 # Given a datetime, return the same datetime but with the hour set to 13 (1pm)
 # (used for setting the time on HG settlements)
-def update_hour(dt, hour=14):
-    #hour = 13
+def update_hour(dt):
+    hour = 13
     #print dt,
     dt = datetime(dt.year, dt.month, dt.day, hour, 0, 0)
     #print dt
@@ -460,7 +455,7 @@ def get_hg_back_month(dt):
 def get_hg_calendar_symbol(dt):
     return "QHG{0}-QHG{1}".format(get_hg_front_month(dt), get_hg_back_month(dt))
 
-def get_copper_discount(df_hg, df_lme, start_year=2010, end_year=datetime.now().year):
+def get_copper_discount(df_lme, start_year=2010, end_year=datetime.now().year):
     unique_dates = pd.DatetimeIndex(df_lme.DateTime).normalize().unique()
 
     df_all = get_copper_spread(df_lme)
@@ -498,22 +493,19 @@ def get_copper_discount(df_hg, df_lme, start_year=2010, end_year=datetime.now().
                 calendar_symbol = get_hg_calendar_symbol(dt1)
                 dfx['Symbol'] = calendar_symbol
 
-            #filename1 = calendar_symbol[:6] + " (1 Hour).csv"
-            #hg_filename1 = join(df_folder, filename1)
-            #df_hgx = read_dataframe(hg_filename1)
-            df_hgx = df_hg[df_hg.Symbol==calendar_symbol[:6]]
-            #df_hgx = df_hgx.sort_values("DateTime")            # these SHOULD already be in sorted order
-            if df_hgx.empty:                                    # skip empty dataframes
-                continue
-            dt = df_hgx.iloc[df_hgx.shape[0]-1].DateTime
+            filename1 = calendar_symbol[:6] + " (1 Hour).csv"
+            hg_filename1 = join(df_folder, filename1)
+            df_hg = read_dataframe(hg_filename1)
+            df_hg = df_hg.sort_values("DateTime")
+            dt = df_hg.iloc[df_hg.shape[0]-1].DateTime
             x = get_calendar_price(calendar_symbol, dt) 
             print(calendar_symbol, dt, x)
-            df_hgx['Cal'] = np.nan
-            for ix,row in df_hgx.iterrows():
+            df_hg['Cal'] = np.nan
+            for ix,row in df_hg.iterrows():
                 x = get_calendar_price(calendar_symbol, row.DateTime)
-                df_hgx.set_value(ix, 'Cal', x)
-            df_hgx = df_hgx.dropna()
-            dfx = pd.merge(dfx, df_hgx, on="DateTime", suffixes=('_LME', '_HG'), sort=False).dropna()
+                df_hg.set_value(ix, 'Cal', x)
+            df_hg = df_hg.dropna()
+            dfx = pd.merge(dfx, df_hg, on="DateTime", suffixes=('_LME', '_HG'), sort=False).dropna()
 
             if df_all.shape[0] == 0:
                 df_all = dfx.copy()
@@ -528,8 +520,8 @@ def get_copper_discount(df_hg, df_lme, start_year=2010, end_year=datetime.now().
 
     #df_all.drop(['Open_LME', 'Open_HG', 'High_LME', 'High_HG', 'Low_LME', 'Low_HG'], axis=1, inplace=True)
     #df_all.rename(columns={ 'Close_LME':'LME', 'Close_HG':'HG' }, inplace=True)
-    df_all.drop(['Open_LME','High_LME','Low_LME','Volume_LME','oi_LME','Symbol_HG','Open_HG','High_HG','Low_HG','Volume_HG','oi_HG'], axis=1, inplace=True)
-    df_all.rename(columns={ 'Symbol_LME':'Symbol', 'Close_LME':'LME', 'Close_HG':'HG' }, inplace=True)
+    df_all.drop(['Open_LME','High_LME','Low_LME','Volume_LME','Open_HG','High_HG','Low_HG','Volume_HG'], axis=1, inplace=True)
+    df_all.rename(columns={ 'Close_LME':'LME', 'Close_HG':'HG' }, inplace=True)
     sequence = ['DateTime', 'HG', 'LME', 'Spread', 'Cal', 'Discount', 'Symbol'] #, 'Volume_HG', 'Volume_LME']
     df_all = df_all.reindex(columns=sequence)
     return df_all
@@ -555,23 +547,6 @@ def write_df(df, filename):
 #data = quandl.get("EIA/PET_RWTC_D", collapse="monthly") # change sampling frequency
 #data = quandl.get("FRED/GDP", transformation="rdiff")   # perform elementary calculations on the data
 
-"""
-# EXPERIMENT: LME Copper vs LME Aluminum
-#df_cop = create_historical_contract_df("M.CU3=LX", interval=INTERVAL_HOUR, force_redownload=True)
-#df_alum = create_historical_contract_df("M.AL3=LX", interval=INTERVAL_HOUR, force_redownload=True)
-dfc = read_dataframe(join(df_folder, "M.CU3=LX_contract.hour.DF.csv"))
-dfa = read_dataframe(join(df_folder, "M.AL3=LX_contract.hour.DF.csv"))
-df = pd.merge(dfc, dfa, on='DateTime')
-df['spread'] = df['Close_x'] - 4*df['Close_y']
-df['diff'] = df['spread'].diff()
-
-#df = df.set_index('DateTime')
-#df = df.resample('24H', how={'spread': np.mean})
-
-dfx = df[df['DateTime']>='2012-01-01']
-plot_(dfx, {'spread':'_b'})
-STOP()
-"""
 
 """
 cl_data = {}
@@ -637,34 +612,20 @@ for dt in date_list:
 sys.exit()
 """
 
-#df = read_dataframe('copper_settle_discount.2.DF.csv')
-#sys.exit()
-
-
 # If we need to update the HG settlement price data from Quandl...
-update_quandl_data()
-
-# If we need to download updated historical data for LME and HG
-df_lme = create_historical_contract_df("M.CU3=LX", interval=INTERVAL_HOUR, force_redownload=True)
-df_hg = create_historical_futures_df("QHG", interval=INTERVAL_HOUR, force_redownload=True)
+#update_quandl_data()
 
 ########## (RE)CREATE COPPER DISCOUNT FILE USING DATA FILES FOR LME AND HG ##########
-lme_filename = join(data_folder, "misc", "LME_settlement.csv")
-df_lme = read_dataframe(join(df_folder, "M.CU3=LX_contract.hour.DF.csv"))   # re-read from file to force DateTime column datatype
-df_hg = read_dataframe(join(df_folder, "QHG_futures.hour.DF.csv"))
+lme_filename = join(df_folder, "M.CU3=LX (1 Hour).csv")
+#lme_filename = join(data_folder, "misc", "LME_settlement.csv")
+df_lme = read_dataframe(lme_filename)
+df = get_copper_discount(df_lme) #, start_year=2017)
+write_df(df, "copper_discount.2.DF.csv")
 
-"""
-df = get_copper_discount(df_hg, df_lme) #, start_year=2017)
-write_dataframe(df, "copper_discount.2.DF.csv")
-#write_df(df, "copper_discount.2.DF.csv")
-"""
+df_lme = df_lme[df_lme['DateTime'].dt.hour == 13]       # get only LME datapoints at time 13:00:00 (to match settlement time for HG)
+df = get_copper_discount(df_lme) #, start_year=2017)
+write_df(df, "copper_settle_discount.2.DF.csv")
 
-# get only LME and HG datapoints at time 13:00:00 (14:00:00 EST) to match settlement time for HG Quandl data
-df_lme = df_lme[df_lme['DateTime'].dt.hour == 14]
-df_hg = df_hg[df_hg['DateTime'].dt.hour == 14]
-df = get_copper_discount(df_hg, df_lme) #, start_year=2017)
-#write_df(df, "copper_settle_discount.2.DF.csv")
-write_dataframe(df, "copper_settle_discount.2.DF.csv")
 
 
 sys.exit()
@@ -752,8 +713,8 @@ df = pd.read_csv(join(project_folder, "copper_premium_discount.csv"), parse_date
 
 roll_filename = "calendar_rolls.csv"
 print("Writing calendar roll file: " + roll_filename)
-fcout = open(join(project_folder, roll_filename), 'w')
-fcout.write("Symbol,FirstDate,FirstCal,FirstDiscount,LastDate,LastCal,LastDiscount\n")
+fout = open(join(project_folder, roll_filename), 'w')
+fout.write("Symbol,FirstDate,FirstCal,FirstDiscount,LastDate,LastCal,LastDiscount\n")
 
 # Group the data by the calendar spread symbol
 sorted_symbols = df_get_sorted_symbols(df)
@@ -770,9 +731,9 @@ for symbol in sorted_symbols:
     d2_str = last.DateTime.strftime("%Y-%m-%d")
     output = "{0},{1},{2},{3},{4},{5},{6}".format(symbol.strip(), d1_str, first.Cal, first.Discount, d2_str, last.Cal, last.Discount)
     #print output
-    fcout.write(output + "\n")
+    fout.write(output + "\n")
 
-fcout.close()
+fout.close()
 
 
 

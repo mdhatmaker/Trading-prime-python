@@ -414,68 +414,6 @@ update_historical = True
 print("Testing ideas for BITCOIN and other crypto currencies")
 print()
 
-my_folder = r"D:\Users\mhatmaker\Dropbox\dev\csharp\CryptoTraderCrossExchange\bin\Debug\netcoreapp2.0"
-data_filename = "xexchange_2018-05-06_231530.DF.csv"
-filename = join(my_folder, data_filename)
-df = pd.read_csv(filename, parse_dates=['DateTime'])
-
-# GDAX vs Binance
-aavg = df['a3'].mean().round(2)
-astd = df['a3'].std().round(2)
-bavg = df['b3'].mean().round(2)
-bstd = df['b3'].std().round(2)
-print("BTC GDAX vs Binance: 2 std =>  a < {0}  b > {1}".format(aavg - 2 * astd, bavg + 2 * bstd))
-      
-STOP()
-
-
-
-my_folder = r"D:\Users\mhatmaker\Dropbox\dev\csharp\CryptoCollector\bin\Debug\netcoreapp2.0"
-#data_filename = "tickers_2018-05-05_210602.DF.csv"
-data_filename = "tickers_2018-05-06_032416.DF.csv"
-filename = join(my_folder, data_filename)
-df = pd.read_csv(filename, parse_dates=['DateTime'])
-
-print(df)
-
-df1 = df['Symbol'] == 'BTC-USD'     # GDAX
-df2 = df['Symbol'] == 'BTCUSD'      # Bitfinex
-df3 = df['Symbol'] == 'USDT_BTC'    # Poloniex
-df4 = df['Symbol'] == 'BTCUSDT'     # Binance
-df5 = df['Symbol'] == 'USDT-BTC'    # Bittrex
-#dfx = df[df1 | df2 | df3 | df4 | df5]
-
-dfx = df[df1]
-dfx['bdiff'] = dfx['Bid'].diff().round(2)
-dfx['adiff'] = dfx['Ask'].diff().round(2)
-x1 = dfx['bdiff'] != 0
-x2 = dfx['adiff'] != 0
-dfx0 = dfx[x1 | x2]         # contains only NON-ZERO bdiff/adiff
-move = 2
-x1 = dfx['bdiff'] > move
-x2 = dfx['adiff'] > move
-x3 = dfx['bdiff'] < -move
-x4 = dfx['adiff'] < -move
-dfxx = dfx[x1 | x2 | x3 | x4]
-
-dfy = df[df2]
-dfy['bdiff'] = dfy['Bid'].diff().round(2)
-dfy['adiff'] = dfy['Ask'].diff().round(2)
-y1 = dfy['bdiff'] != 0
-y2 = dfy['adiff'] != 0
-dfy0 = dfy[y1 | y2]         # contains only NON-ZERO bdiff/adiff
-move = 10
-y1 = dfy['bdiff'] > move
-y2 = dfy['adiff'] > move
-y3 = dfy['bdiff'] < -move
-y4 = dfy['adiff'] < -move
-dfyy = dfy[y1 | y2 | y3 | y4]
-
-
-
-STOP()
-
-
 # Re-download the coinmarketcap.com data to a local dataframe file:
 #update_coinmarketcap_dataframe()
 
